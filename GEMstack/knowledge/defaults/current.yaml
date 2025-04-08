@@ -1,8 +1,7 @@
 # ********* Main settings entry point for behavior stack ***********
 
 # Configure settings for the vehicle / vehicle model
-# vehicle:  !include ../vehicle/gem_e4.yaml
-vehicle:  !include ../vehicle/gem_e2_gazebo.yaml
+vehicle:  !include ../vehicle/gem_e4.yaml
 
 #arguments for algorithm components here
 model_predictive_controller:
@@ -33,3 +32,4 @@ simulator:
         #velocity_noise:
         #    constant: 0.04  #4cm/s noise
         #    linear: 0.02    #2% noise
+    vehicle: !include ../vehicle/gem_e2_gazebo.yaml

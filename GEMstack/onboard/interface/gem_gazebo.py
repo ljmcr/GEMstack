@@ -140,15 +140,15 @@ class GEMDoubleIntegratorSimulation:
     """
     def __init__(self, scene : str = None):
         self.dubins = SecondOrderDubinsCar(
-            wheelAngleMin=settings.get('vehicle.geometry.min_wheel_angle'),
-            wheelAngleMax=settings.get('vehicle.geometry.max_wheel_angle'),
-            velocityMin=-settings.get('vehicle.limits.max_reverse_speed'),
-            velocityMax=settings.get('vehicle.limits.max_speed'),
-            accelMin=-settings.get('vehicle.limits.max_acceleration'),
-            accelMax=settings.get('vehicle.limits.max_deceleration'),
-            wheelAngleRateMin=-settings.get('vehicle.limits.max_steering_rate'),
-            wheelAngleRateMax=settings.get('vehicle.limits.max_steering_rate'),
-            wheelBase=settings.get('vehicle.geometry.wheelbase'))
+            wheelAngleMin=settings.get('simulator.vehicle.geometry.min_wheel_angle'),
+            wheelAngleMax=settings.get('simulator.vehicle.geometry.max_wheel_angle'),
+            velocityMin=-settings.get('simulator.vehicle.limits.max_reverse_speed'),
+            velocityMax=settings.get('simulator.vehicle.limits.max_speed'),
+            accelMin=-settings.get('simulator.vehicle.limits.max_acceleration'),
+            accelMax=settings.get('simulator.vehicle.limits.max_deceleration'),
+            wheelAngleRateMin=-settings.get('simulator.vehicle.limits.max_steering_rate'),
+            wheelAngleRateMax=settings.get('simulator.vehicle.limits.max_steering_rate'),
+            wheelBase=settings.get('simulator.vehicle.geometry.wheelbase'))
         
         self.dt = settings.get('simulator.dt',0.01)
         self.roadgraph = None
@@ -308,8 +308,8 @@ class GEMDoubleIntegratorSimulationInterface(GEMInterface):
         self.thread_data = dict()
         self.thread = None 
 
-        self.max_send_rate = settings.get('vehicle.max_command_rate',10.0)
-        self.ros_sensor_topics = settings.get('vehicle.sensors.ros_topics')
+        self.max_send_rate = settings.get('simulator.vehicle.max_command_rate',10.0)
+        self.ros_sensor_topics = settings.get('simulator.vehicle.sensors.ros_topics')
         self.last_command_time = 0.0
         self.last_reading = GEMVehicleReading()
         self.last_reading.speed = 0.0
