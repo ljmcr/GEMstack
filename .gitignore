@@ -165,3 +165,11 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+
+.vscode/
+ZED_SDK_Ubuntu20_cuda11.8_v4.0.8.zstd.run
+onedrive_config.json
+ros.asc
+scenes/gazebo.yaml
+zed_sdk.run
+

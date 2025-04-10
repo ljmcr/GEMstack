@@ -620,12 +620,12 @@ class GEMDoubleIntegratorSimulationInterface(GEMInterface):
         msg = AckermannDrive()
         msg.acceleration = acceleration
         msg.speed = float('inf') if acceleration >0 else 0  #acceleration * self.dt 
-        msg.steering_angle = -phides
-        msg.steering_angle_velocity = -steering_angle_rate
+        msg.steering_angle = phides
+        msg.steering_angle_velocity = steering_angle_rate
 
 
-        self.ackermann_pub.publish(msg)
-        rospy.loginfo(f"Published AckermannDrive: {msg}")
+        #self.ackermann_pub.publish(msg)
+        #rospy.loginfo(f"Published AckermannDrive: {msg}")
         self.last_command = command
 
 

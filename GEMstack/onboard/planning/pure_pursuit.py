@@ -8,6 +8,9 @@ from ...knowledge.vehicle.geometry import front2steer
 from ..interface.gem import GEMVehicleCommand
 from ..component import Component
 import numpy as np
+import rospy
+from ackermann_msgs.msg import AckermannDrive
+
 
 class PurePursuit(object):   
     """Implements a pure pursuit controller on a second-order Dubins vehicle."""
@@ -38,6 +41,7 @@ class PurePursuit(object):
         self.current_path_parameter = 0.0
         self.current_traj_parameter = 0.0
         self.t_last = None
+
 
     def set_path(self, path : Path):
         if path == self.path_arg:
@@ -91,8 +95,8 @@ class PurePursuit(object):
         #(rather than just advancing the parameter)
         des_parameter = closest_parameter + self.look_ahead + self.look_ahead_scale * speed
         print("Closest parameter: " + str(closest_parameter),"distance to path",closest_dist)
-        if closest_dist > 0.1:
-            print("Closest point",self.path.eval(closest_parameter),"vs",(curr_x,curr_y))
+        #if closest_dist > 0.1:
+        rospy.loginfo(f"Closest point {self.path.eval(closest_parameter)} vs ,{(curr_x,curr_y)}")
         if des_parameter >= self.path.domain()[1]:
             #we're at the end of the path, calculate desired point by extrapolating from the end of the path
             end_pt = self.path.points[-1]
@@ -106,7 +110,7 @@ class PurePursuit(object):
             desired_x,desired_y = self.path.eval(des_parameter)
         desired_yaw = np.arctan2(desired_y-curr_y,desired_x-curr_x)
         #print("Desired point",(desired_x,desired_y)," with lookahead distance",self.look_ahead + self.look_ahead_scale * speed)
-        #print("Current yaw",curr_yaw,"desired yaw",desired_yaw)
+        print("Current yaw",curr_yaw,"desired yaw",desired_yaw)
 
         # distance between the desired point and the vehicle
         L = transforms.vector2_dist((desired_x,desired_y),(curr_x,curr_y))
@@ -127,8 +131,8 @@ class PurePursuit(object):
         #print("Closest point distance: " + str(L))
         print("Forward velocity: " + str(speed))
         ct_error = np.sin(alpha) * L
-        print("Crosstrack Error: " + str(round(ct_error,3)))
-        print("Front wheel angle: " + str(round(np.degrees(f_delta),2)) + " degrees")
+        #print("Crosstrack Error: " + str(round(ct_error,3)))
+        #print("Front wheel angle: " + str(round(np.degrees(f_delta),2)) + " degrees")
         steering_angle = np.clip(front2steer(f_delta), self.steering_angle_range[0], self.steering_angle_range[1])
         print("Steering wheel angle: " + str(round(np.degrees(steering_angle),2)) + " degrees" )
         
@@ -194,6 +198,7 @@ class PurePursuitTrajectoryTracker(Component):
     def __init__(self,vehicle_interface=None, **args):
         self.pure_pursuit = PurePursuit(**args)
         self.vehicle_interface = vehicle_interface
+        self.ackermann_pub = rospy.Publisher("ackermann_cmd", AckermannDrive, queue_size=1)
 
     def rate(self):
         return 50.0
@@ -207,10 +212,20 @@ class PurePursuitTrajectoryTracker(Component):
     def update(self, vehicle : VehicleState, trajectory: Trajectory):
         self.pure_pursuit.set_path(trajectory)
         accel,wheel_angle = self.pure_pursuit.compute(vehicle, self)
-        #print("Desired wheel angle",wheel_angle)
+        print("Desired wheel angle",wheel_angle)
         steering_angle = np.clip(front2steer(wheel_angle), self.pure_pursuit.steering_angle_range[0], self.pure_pursuit.steering_angle_range[1])
         #print("Desired steering angle",steering_angle)
-        self.vehicle_interface.send_command(self.vehicle_interface.simple_command(accel,steering_angle, vehicle))
+        #rospy.loginfo(f"accel from pure pursuit {wheel_angle}")
+
+        msg = AckermannDrive()
+        msg.acceleration = accel
+        msg.speed = 3#float('inf') if accel >0 else 0  #acceleration * self.dt 
+        msg.steering_angle = wheel_angle
+        #msg.steering_angle_velocity = steering_angle_rate
+
+        self.ackermann_pub.publish(msg)
+
+        #self.vehicle_interface.send_command(self.vehicle_interface.simple_command(accel,steering_angle, vehicle))
     
     def healthy(self):
         return self.pure_pursuit.path is not None
