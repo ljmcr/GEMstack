@@ -105,8 +105,8 @@ class PurePursuit(object):
         else:
             desired_x,desired_y = self.path.eval(des_parameter)
         desired_yaw = np.arctan2(desired_y-curr_y,desired_x-curr_x)
-        #print("Desired point",(desired_x,desired_y)," with lookahead distance",self.look_ahead + self.look_ahead_scale * speed)
-        #print("Current yaw",curr_yaw,"desired yaw",desired_yaw)
+        print("Desired point",(desired_x,desired_y)," with lookahead distance",self.look_ahead + self.look_ahead_scale * speed)
+        print("Current yaw",curr_yaw,"desired yaw",desired_yaw)
 
         # distance between the desired point and the vehicle
         L = transforms.vector2_dist((desired_x,desired_y),(curr_x,curr_y))
@@ -211,6 +211,7 @@ class PurePursuitTrajectoryTracker(Component):
         steering_angle = np.clip(front2steer(wheel_angle), self.pure_pursuit.steering_angle_range[0], self.pure_pursuit.steering_angle_range[1])
         #print("Desired steering angle",steering_angle)
         self.vehicle_interface.send_command(self.vehicle_interface.simple_command(accel,steering_angle, vehicle))
+        print("accel",accel,"steering_angle",steering_angle)
     
     def healthy(self):
         return self.pure_pursuit.path is not None
