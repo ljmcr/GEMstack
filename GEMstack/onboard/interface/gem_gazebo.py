@@ -140,8 +140,8 @@ class GEMGazeboInterface(GEMInterface):
                 # Assuming Gazebo's yaw is 0 when facing east (ROS REP 103 convention)
                 # Convert IMU's yaw to heading (CW from North), then to navigation yaw (CCW from East)
                 # This handles the coordinate frame differences between Gazebo and the navigation frame
-                # heading = transforms.yaw_to_heading(-yaw, degrees=False)  # Negate yaw to convert from ROS to heading
-                # navigation_yaw = transforms.heading_to_yaw(heading, degrees=False)
+                heading = transforms.yaw_to_heading(-yaw, degrees=False)  # Negate yaw to convert from ROS to heading
+                navigation_yaw = transforms.heading_to_yaw(heading, degrees=False)
                 
                 # Create fused pose with transformed yaw
                 pose = ObjectPose(
@@ -152,7 +152,7 @@ class GEMGazeboInterface(GEMInterface):
                     z=gps_msg.altitude,
                     roll=roll,
                     pitch=pitch,
-                    yaw=yaw
+                    yaw=navigation_yaw
                 )
                 
                 # Create GNSS reading with fused data
@@ -231,7 +231,7 @@ class GEMGazeboInterface(GEMInterface):
         
         # Calculate linear/speed from accelerator/brake
         # For simplicity, map 0-1 accelerator to 0-max_speed
-        max_speed = 2.5  # m/s
+        max_speed = 3.0 # m/s
         
         # In gazebo we use speed instead of acceleration
         desired_speed = 0.0
