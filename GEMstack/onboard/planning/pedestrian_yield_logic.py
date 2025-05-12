@@ -58,6 +58,11 @@ class PedestrianYielder(Component):
 
             """ collision estimation based on agent states in vehicle frame """
             if a.type == AgentEnum.PEDESTRIAN:
+
+                velocity_mag = np.linalg.norm(a.velocity[:2])
+                if DEBUG:
+                        print(f"[DEBUG] Pedestrian object: ID {n}, velocity = {velocity_mag:.2f}")
+
                 check, t_min, min_dist, pt_min = check_collision_in_vehicle_frame(a, vehicle)
                 if DEBUG:
                     print(
